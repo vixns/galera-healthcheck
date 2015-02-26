@@ -9,8 +9,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cloudfoundry-incubator/galera-healthcheck/healthcheck"
-	. "github.com/cloudfoundry-incubator/galera-healthcheck/logger"
+	"github.com/sttts/galera-healthcheck/healthcheck"
+	. "github.com/sttts/galera-healthcheck/logger"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -60,10 +60,12 @@ var healthchecker *healthcheck.Healthchecker
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	result, msg := healthchecker.Check()
-	if result {
+	if result != nil && result.Healthy {
 		w.WriteHeader(http.StatusOK)
-	} else {
+	} else if result != nil && !result.Healthy {
 		w.WriteHeader(http.StatusServiceUnavailable)
+	} else {
+		w.WriteHeader(http.StatusContinue)
 	}
 
 	fmt.Fprintf(w, "Galera Cluster Node status: %s", msg)
