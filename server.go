@@ -61,7 +61,11 @@ var healthchecker *healthcheck.Healthchecker
 func handler(w http.ResponseWriter, r *http.Request) {
 	result, msg := healthchecker.Check()
 	if result {
-		w.WriteHeader(http.StatusOK)
+		if msg == "syncing" {
+			w.WriteHeader(http.StatusContinue)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
 	} else {
 		w.WriteHeader(http.StatusServiceUnavailable)
 	}

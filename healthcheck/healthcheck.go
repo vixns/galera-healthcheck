@@ -5,8 +5,10 @@ import (
 )
 
 const (
-	SYNCED_STATE         = "4"
+	JOINING_STATE       = "1"
 	DONOR_DESYNCED_STATE = "2"
+	JOINED_STATE         = "3"
+	SYNCED_STATE         = "4"
 )
 
 type Healthchecker struct {
@@ -34,7 +36,9 @@ func (h *Healthchecker) Check() (bool, string) {
 	switch {
 	case err != nil:
 		return false, err.Error()
-	case value == SYNCED_STATE || (value == DONOR_DESYNCED_STATE && h.config.AvailableWhenDonor):
+	case value == JOINING_STATE || value == DONOR_DESYNCED_STATE || value == JOINED_STATE:
+		return true, "syncing"
+	case value == SYNCED_STATE:
 		if !h.config.AvailableWhenReadOnly {
 			var ro_variable_name string
 			var ro_value string
