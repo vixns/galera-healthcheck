@@ -32,6 +32,12 @@ var mysqlPassword = flag.String(
 	"Specifies the MySQL password to connect with",
 )
 
+var mysqlSocket = flag.String(
+	"socket",
+	"/var/run/mysqld/mysqld.sock",
+	"Specifies the MySQL unix socket",
+)
+
 var availableWhenDonor = flag.Bool(
 	"availWhenDonor",
 	true,
@@ -80,7 +86,7 @@ func main() {
 		panic(err)
 	}
 
-	db, _ := sql.Open("mysql", fmt.Sprintf("%s:%s@/", *mysqlUser, *mysqlPassword))
+	db, _ := sql.Open("mysql", fmt.Sprintf("%s:%s@unix(%s)/", *mysqlUser, *mysqlPassword, *mysqlSocket))
 	config := healthcheck.HealthcheckerConfig{
 		*availableWhenDonor,
 		*availableWhenReadOnly,
